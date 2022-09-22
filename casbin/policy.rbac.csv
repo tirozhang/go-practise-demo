@@ -1,0 +1,9 @@
+p, doctor, data, read
+p, doctor, data, write
+p, assist, data, read
+p, leader, data2, read
+g, doctorA, doctor
+g, doctorB, doctor
+g, assistA, assist
+g, doctor, leader
+
