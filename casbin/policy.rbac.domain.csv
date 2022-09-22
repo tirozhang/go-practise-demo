@@ -1,0 +1,13 @@
+p, Doctor, team1, drafts, create
+p, Doctor, team1, drafts, read
+p, Assistant, team1, drafts, read
+
+p, Doctor, team2, drafts, create
+p, Doctor, team2, drafts, read
+p, Assistant, team2, drafts, read
+
+g, user_01, Doctor, team1
+g, user_02, Assistant, team1
+g, user_01, Assistant, team2
+
+
