@@ -2,13 +2,16 @@ package main
 
 import (
 	"context"
-	hello "github.com/tirozhang/go-practise-demo/grpc/hello/gen/v1"
-	"google.golang.org/grpc"
 	"log"
 	"net"
+
+	hello "github.com/tirozhang/go-practise-demo/grpc/hello/gen/v1"
+	"google.golang.org/grpc"
 )
 
-type Server struct{}
+type Server struct {
+	hello.UnimplementedGreeterServer
+}
 
 func (s *Server) SayHello(ctx context.Context, in *hello.HelloRequest) (*hello.HelloReply, error) {
 	return &hello.HelloReply{Message: "Hello " + in.Name}, nil

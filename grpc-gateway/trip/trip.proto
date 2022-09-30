@@ -1,0 +1,35 @@
+syntax = "proto3";
+package coolcar;
+option go_package = "./gen/v1;trippb";
+
+enum TripStatus {
+    _           = 0;
+    TS_NOT_SPEC = 1;
+}
+
+message Location {
+    double latitude  = 1;
+    double longitude = 2;
+}
+
+message Trip {
+    string start                     = 1;
+    Location start_pos               = 5;
+    repeated Location path_locations = 7;
+    string end                       = 2;
+    Location end_pos                 = 6;
+    int64 duration_sec               = 3;
+    int64 fee_cent                   = 4;
+    TripStatus status                = 8;
+}
+message GetTripReq {
+    string trip_id = 1;
+}
+message GetTripResp {
+    string trip_id = 1;
+    Trip trip      = 2;
+}
+
+service TripService {
+    rpc GetTrip(GetTripReq) returns (GetTripResp);
+}
