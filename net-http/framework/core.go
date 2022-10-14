@@ -36,7 +36,7 @@ func (c *Core) Get(url string, handlers ...ControllerHandler) {
 	if err := c.router["GET"].AddRouter(url, handlers...); err != nil {
 		log.Fatal("add router error: ", err)
 	}
-	PrintTree(0, c.router["GET"].root)
+	//PrintTree(0, c.router["GET"].root)
 	//log.Println("add router success", url)
 }
 
@@ -72,15 +72,20 @@ func (c *Core) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	handlers := c.FindRouteByRequest(r)
 
 	if handlers == nil {
-		ctx.Json(http.StatusNotFound, "404 not found")
+		// 如果没有找到，这里打印日志
+		ctx.SetStatus(404).Json("not found")
 		return
 	}
 	glog.Infoln("core.router")
 
 	ctx.SetHandlers(handlers)
 
+	// 设置路由参数
+	//params := node.parseParamsFromEndNode(request.URL.Path)
+	//ctx.SetParams(params)
+
 	if err := ctx.Next(); err != nil {
-		ctx.Json(http.StatusInternalServerError, err.Error())
+		ctx.SetStatus(500).Json("inner error")
 		return
 	}
 }
@@ -112,6 +117,7 @@ func (c *Core) FindRouteByRequest(r *http.Request) []ControllerHandler {
 	return handler
 }
 
+// combineHandlers 合并中间件和路由处理函数 直接append会传递引用，导致覆盖
 func (c *Core) combineHandlers(handlers ...ControllerHandler) []ControllerHandler {
 	finalSize := len(c.middlewares) + len(handlers)
 	mergedHandlers := make([]ControllerHandler, finalSize)

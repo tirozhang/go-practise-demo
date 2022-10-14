@@ -30,9 +30,9 @@ func FooControllerHandler(c *framework.Context) error {
 		// panic(errors.New("panic"))
 		// time.Sleep(10 * time.Second)
 
-		foo := c.QueryString("foo", "empty")
+		foo, _ := c.QueryString("foo", "empty")
 		obj["data"] = foo
-		c.Json(http.StatusOK, obj)
+		c.SetStatus(http.StatusOK).Json(obj)
 		finish <- struct{}{}
 	}()
 	select {
@@ -40,13 +40,13 @@ func FooControllerHandler(c *framework.Context) error {
 		c.WriterMux().Lock()
 		defer c.WriterMux().Unlock()
 		glog.Errorf("%v", p)
-		c.Json(http.StatusInternalServerError, p)
+		c.SetStatus(http.StatusInternalServerError).Json(p)
 	case <-finish:
 		glog.Infoln("finish")
 	case <-durationCtx.Done():
 		c.WriterMux().Lock()
 		defer c.WriterMux().Unlock()
-		c.Json(http.StatusInternalServerError, "time out")
+		c.SetStatus(http.StatusInternalServerError).Json("time out")
 		c.SetHasTimeout()
 	}
 

@@ -2,7 +2,6 @@ package framework
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"sync"
 )
@@ -19,7 +18,9 @@ type Context struct {
 
 	// 当前请求的handler链条
 	handlers []ControllerHandler
-	index    int // 当前请求调用到调用链的哪个节点
+	index    int               // 当前请求调用到调用链的哪个节点
+	params   map[string]string // url路由匹配的参数
+
 }
 
 func NewContext(w http.ResponseWriter, r *http.Request) *Context {
@@ -67,36 +68,9 @@ func (ctx *Context) Value(key interface{}) interface{} {
 	return ctx.BaseContext().Value(key)
 }
 
-func (ctx *Context) QueryAll() map[string][]string {
-	if ctx.request != nil {
-		return map[string][]string(ctx.request.URL.Query())
-	}
-	return map[string][]string{}
-}
-
-func (ctx *Context) QueryString(key string, def string) string {
-	params := ctx.QueryAll()
-	if val, ok := params[key]; ok {
-		if varLen := len(val); varLen > 0 {
-			return val[varLen-1]
-		}
-	}
-	return def
-}
-
-func (ctx *Context) Json(status int, obj interface{}) error {
-	if ctx.HasTimeout() {
-		return nil
-	}
-	ctx.responseWriter.Header().Set("Content-Type", "application/json")
-	ctx.responseWriter.WriteHeader(status)
-	byt, err := json.Marshal(obj)
-	if err != nil {
-		ctx.responseWriter.WriteHeader(500)
-		return err
-	}
-	ctx.responseWriter.Write(byt)
-	return nil
+// 设置参数
+func (ctx *Context) SetParams(params map[string]string) {
+	ctx.params = params
 }
 
 func (ctx *Context) Next() error {
